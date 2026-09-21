@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RUNNER QUEST — Training OS Prototype</title>
+<style>
+:root{
+  --bg:#f7f7f2; --card:#fff; --ink:#25312b; --muted:#7c8780;
+  --green:#6fba88; --green2:#dff2e4; --mint:#eef8f0; --yellow:#f4d66d;
+  --pink:#f5dce5; --blue:#dcecf5; --line:#e8ebe6; --shadow:0 10px 30px rgba(45,61,52,.08);
+  --radius:24px;
+}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif}
+button,input,textarea,select{font:inherit} button{cursor:pointer;border:0}
+.app{max-width:1120px;margin:auto;padding:20px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:21px}.logo{width:38px;height:38px;border-radius:14px;background:var(--green);display:grid;place-items:center;color:white;font-size:20px}
+.pill{background:#fff;border:1px solid var(--line);padding:9px 13px;border-radius:999px;color:var(--muted);font-size:12px}
+.nav{display:flex;gap:7px;overflow:auto;margin-bottom:18px}.nav button{background:transparent;color:var(--muted);padding:10px 13px;border-radius:14px;white-space:nowrap}.nav button.active{background:#fff;color:var(--ink);box-shadow:var(--shadow);font-weight:800}
+.grid{display:grid;gap:14px}.g2{grid-template-columns:1.25fr .75fr}.g3{grid-template-columns:repeat(3,1fr)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.hero{background:linear-gradient(135deg,#edf8ef,#fff 60%);position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;right:-65px;top:-70px;background:#d9f0df}
+.eyebrow{font-size:11px;letter-spacing:.12em;color:var(--muted);font-weight:800}.big{font-size:38px;font-weight:950;letter-spacing:-.04em;margin:5px 0}.sub{color:var(--muted);font-size:13px;line-height:1.6}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.tag{display:inline-block;padding:6px 9px;border-radius:10px;background:var(--mint);font-size:11px;font-weight:800}.tag.pink{background:var(--pink)}.tag.blue{background:var(--blue)}.tag.yellow{background:#fff6cf}
+.progress{height:9px;background:#edf0eb;border-radius:99px;overflow:hidden}.progress i{display:block;height:100%;background:var(--green);border-radius:99px}
+.metric{font-size:24px;font-weight:900}.small{font-size:11px;color:var(--muted)}
+.section{margin:18px 0 10px;font-size:15px;font-weight:900}
+.chart{height:220px;margin-top:10px;position:relative}.chart svg{width:100%;height:100%;overflow:visible}.chart .gridline{stroke:#edf0eb;stroke-width:1}.chart text{fill:#929b94;font-size:10px}.line{fill:none;stroke:var(--green);stroke-width:4;stroke-linecap:round;stroke-linejoin:round}.dot{fill:#fff;stroke:var(--green);stroke-width:4}
+.coach{background:#26322c;color:#fff;border-radius:22px;padding:18px}.coach .eyebrow{color:#b9d7c1}.coach strong{color:#dff2e4}
+.quest{display:flex;align-items:center;gap:13px;padding:14px 0;border-bottom:1px solid var(--line)}.quest:last-child{border-bottom:0}.check{width:32px;height:32px;border-radius:12px;background:var(--green2);display:grid;place-items:center;color:#37834e;font-weight:900}
+.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.field{background:#f8f9f6;border:1px solid #e9ece7;border-radius:18px;padding:13px}.field label{display:block;font-size:11px;color:var(--muted);font-weight:800;margin-bottom:6px}.field input,.field textarea,.field select{width:100%;border:0;background:transparent;outline:0;color:var(--ink)}textarea{resize:vertical;min-height:80px}
+.choice{display:flex;flex-wrap:wrap;gap:7px}.choice button{padding:9px 12px;border-radius:12px;background:#f1f3ef;color:var(--muted)}.choice button.sel{background:var(--green2);color:#337c48;font-weight:800}
+.primary{background:var(--green);color:white;padding:13px 17px;border-radius:15px;font-weight:900;width:100%}.primary:disabled{opacity:0.6;cursor:not-allowed}.ghost{background:#f1f3ef;color:var(--ink);padding:12px 15px;border-radius:14px;font-weight:800}
+.zone{padding:13px;border-radius:18px;background:#fafbf8;border:1px solid var(--line);margin-top:9px}.zone .bar{height:7px;background:#e9ede8;border-radius:99px;margin-top:9px}.zone .bar i{display:block;height:100%;background:var(--green);border-radius:99px}
+.level{font-size:44px;font-weight:950}.levelbar{height:13px;background:#edf0eb;border-radius:99px;overflow:hidden}.levelbar i{display:block;height:100%;background:linear-gradient(90deg,var(--green),#a9dcae)}
+.rival{display:grid;grid-template-columns:1fr 1fr;gap:12px}.person{padding:14px;border:1px solid var(--line);border-radius:18px}.avatar{width:40px;height:40px;border-radius:15px;background:var(--pink);display:grid;place-items:center;font-weight:900}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#26322c;color:#fff;padding:12px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:.25s;z-index:99}.toast.show{opacity:1}
+.coach-response-box{white-space:pre-wrap;line-height:1.6;margin-top:10px;font-size:14px}
+@media(max-width:760px){.app{padding:12px}.g2,.g3,.formgrid{grid-template-columns:1fr}.big{font-size:32px}.card{padding:17px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="brand"><div class="logo">↗</div>RUNNER QUEST</div>
+    <div class="pill">監督人格：超厳しめ / 忖度なし</div>
+  </div>
+  <div class="nav" id="nav"></div>
+  <main id="main"></main>
+</div>
+<div class="toast" id="toast">保存しました</div>
+
+<script>
+const tabs=[
+  ["home","HOME"],["plan","PLAN"],["log","LOG"],["growth","GROWTH"],["connect","SETTINGS / CONNECT"],["zones","ZONES"],["roadmap","ROADMAP"]
+];
+let state=JSON.parse(localStorage.getItem("runnerQuest")||"null")||{
+  tab:"home", rpe:5, sleep:8, fatigue:3, pain:0,
+  log:{distance:10,zone:"Aerobic",note:""},
+  apiKey:"", model:"gpt-4o-mini",
+  coachResponse:"練習内容を入力して「監督に報告する」を押してください。",
+  levels:{overall:27, aerobic:29, speed:24, endurance:28},
+  predictions:[
+    {p:"8/16",a:250.3,b:575.0,c:958.0},
+    {p:"8/30",a:248.7,b:571.0,c:950.0},
+    {p:"9/18",a:253.0,b:573.0,c:952.0},
+    {p:"10/05",a:251.5,b:568.5,c:944.0},
+    {p:"11/01",a:247.5,b:562.0,c:932.0}
+  ],
+  quests:[false,false,false],
+  loading:false
+};
+
+function save(){localStorage.setItem("runnerQuest",JSON.stringify(state))}
+function toast(t){const x=document.getElementById("toast");x.textContent=t;x.classList.add("show");setTimeout(()=>x.classList.remove("show"),2000)}
+function nav(){document.getElementById("nav").innerHTML=tabs.map(([id,n])=>`<button class="${state.tab===id?'active':''}" onclick="go('${id}')">${n}</button>`).join("")}
+function go(t){state.tab=t;save();render()}
+function esc(s){return String(s||'').replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+
+function fmtTime(v,k){return `${Math.floor(v/60)}:${String(Math.round(v%60)).padStart(2,"0")}`}
+function svgLine(key, title, unit, invert=false){
+ const arr=state.predictions, vals=arr.map(x=>x[key]); let min=Math.min(...vals),max=Math.max(...vals), pad=(max-min||1)*.18;
+ const W=700,H=210,L=42,R=16,T=20,B=32; const x=i=>L+i*(W-L-R)/(arr.length-1); const y=v=>T+(max+pad-v)*(H-T-B)/(max-min+2*pad);
+ const pts=vals.map((v,i)=>`${x(i)},${y(v)}`).join(" ");
+ return `<div class="chart"><svg viewBox="0 0 ${W} ${H}">
+ <line class="gridline" x1="${L}" y1="${y(max)}" x2="${W-R}" y2="${y(max)}"/><line class="gridline" x1="${L}" y1="${y(min)}" x2="${W-R}" y2="${y(min)}"/>
+ <polyline class="line" points="${pts}"/>
+ ${vals.map((v,i)=>`<circle class="dot" cx="${x(i)}" cy="${y(v)}" r="5"/><text x="${x(i)}" y="${H-8}" text-anchor="middle">${arr[i].p}</text>`).join("")}
+ <text x="3" y="${y(max)+4}">${fmtTime(max,key)}</text><text x="3" y="${y(min)+4}">${fmtTime(min,key)}</text>
+ </svg></div>`;
+}
+
+function home(){
+ return `<div class="grid g2">
+ <section class="card hero"><div class="eyebrow">ROAD TO YOUR GOAL</div><div class="big">県駅伝 → 冬季 → 来夏</div><p class="sub">距離の多さではなく、<b>今の時期に必要な能力が伸びているか</b>を追う。</p><div class="row" style="margin-top:20px"><div><div class="small">RUNNER LEVEL</div><div class="level">${state.levels.overall}</div></div><div class="tag">成長中</div></div><div class="levelbar" style="margin-top:8px"><i style="width:${state.levels.overall/40*100}%"></i></div></section>
+ <section class="coach"><div class="eyebrow">HEAD COACH</div><h3>今日は「多く走る日」じゃない。</h3><p>練習の価値は距離では決まらない。<strong>目的に対して適切な負荷だったか</strong>を見ろ。疲労が高いなら、予定を守ることより質を守ることが優先だ。</p><button class="primary" onclick="go('log')" style="margin-top:10px">今日の練習を報告 →</button></section>
+ </div>
+ <div class="section">今日のミッション</div>
+ <section class="card">${[
+ ["①","予定の目的を確認","「何の能力を伸ばす日か」を一言で言える状態にする。"],
+ ["②","実績を記録","距離だけでなくRPE・睡眠・疲労・痛みも残す。"],
+ ["③","監督チェック","予定と実績のズレを次の練習に反映する。"]
+ ].map((q,i)=>`<div class="quest"><div class="check">${state.quests[i]?"✓":q[0]}</div><div style="flex:1"><b>${q[1]}</b><div class="small">${q[2]}</div></div><button class="ghost" onclick="toggleQuest(${i})">${state.quests[i]?"完了":"やる"}</button></div>`).join("")}</section>
+ <div class="section">競技力の現在地</div>
+ <div class="grid g3">${[
+ ["1500m","4:07.5","スピード特異性","pink"],["3000m","9:28.5","有酸素＋スピード持久","blue"],["5000m","15:32.0","持久力","yellow"]
+ ].map(x=>`<div class="card"><span class="tag ${x[3]}">${x[2]}</span><div class="metric" style="margin-top:12px">${x[1]}</div><div class="small">${x[0]} 一点予想</div></div>`).join("")}</div>`;
+}
+
+function plan(){
+ return `<div class="grid g2"><section class="card"><div class="eyebrow">YOUR PLAN</div><h2>6週間の練習計画</h2><p class="sub">最初に自分で組む。AIは「正しいか」ではなく、目的・順序・負荷・回復の整合性を厳しく監査する。</p>
+ ${["駅伝に向けた有酸素基盤","LT / ペース耐性","レース特異性"].map((x,i)=>`<div class="zone"><div class="row"><b>${x}</b><span class="tag">${["今週","来週","次の段階"][i]}</span></div><div class="bar"><i style="width:${[72,48,25][i]}%"></i></div></div>`).join("")}
+ <button class="primary" style="margin-top:14px" onclick="toast('計画編集画面を開きました（試作品）')">計画を編集する</button></section>
+ <section class="coach"><div class="eyebrow">AUDIT</div><h3>監査ポイント</h3><p>「距離が多いから偉い」「ポイントをこなしたから偉い」は禁止。<strong>次のポイントに質を残せる配置か</strong>まで見る。</p><p>休養日もトレーニング計画の一部。睡眠不足・痛み・高疲労が続く場合は警告を出す。</p></section></div>`;
+}
+
+function log(){
+ return `<div class="grid g2"><section class="card"><div class="eyebrow">DAILY LOG</div><h2>今日、どうだった？</h2><p class="sub">入力は数十秒で答えられる形式。送信するとChatGPT監督が即座に分析します。</p>
+ <div class="field"><label>今日の練習距離 (km)</label><input id="dist" type="number" value="${state.log.distance}" placeholder="距離 km"></div>
+ <div class="field" style="margin-top:10px"><label>練習の種類</label><select id="zone"><option ${state.log.zone==="Recovery"?"selected":""}>Recovery</option><option ${state.log.zone==="Aerobic"?"selected":""}>Aerobic</option><option ${state.log.zone==="LT"?"selected":""}>LT</option><option ${state.log.zone==="VO2max"?"selected":""}>VO2max</option><option ${state.log.zone==="Speed"?"selected":""}>Speed</option><option ${state.log.zone==="Race Specific"?"selected":""}>Race Specific</option></select></div>
+ <div class="section">きつさ (RPE 1-10)</div><div class="choice">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button class="${state.rpe===n?'sel':''}" onclick="state.rpe=${n};render()">${n}</button>`).join("")}</div>
+ <div class="section">睡眠時間</div><div class="choice">${[6,7,8,9,10].map(n=>`<button class="${state.sleep===n?'sel':''}" onclick="state.sleep=${n};render()">${n}h</button>`).join("")}</div>
+ <div class="section">疲労感 (1-5)</div><div class="choice">${[1,2,3,4,5].map(n=>`<button class="${state.fatigue===n?'sel':''}" onclick="state.fatigue=${n};render()">${n}</button>`).join("")}</div>
+ <div class="section">痛み・違和感 (0-3)</div><div class="choice">${[0,1,2,3].map(n=>`<button class="${state.pain===n?'sel':''}" onclick="state.pain=${n};render()">${n===0?"なし":n}</button>`).join("")}</div>
+ <div class="field" style="margin-top:12px"><label>ひとこと・感覚</label><textarea id="note" placeholder="脚・呼吸・フォーム・天候など">${esc(state.log.note)}</textarea></div>
+ <button class="primary" style="margin-top:14px" onclick="submitToCoach()" ${state.loading?"disabled":""}>${state.loading?"監督が分析中...":"監督（ChatGPT）に報告する →"}</button></section>
+
+ <section class="coach"><div class="eyebrow">COACH RESPONSE (AI)</div>
+ <p class="small" style="color:#b9d7c1">現在の設定: RPE <strong>${state.rpe}</strong> / 睡眠 <strong>${state.sleep}h</strong> / 疲労 <strong>${state.fatigue}/5</strong> / 痛み <strong>${state.pain}</strong></p>
+ <div class="coach-response-box" id="coachText">${esc(state.coachResponse)}</div></section></div>`;
+}
+
+function growth(){
+ return `<div class="card"><div class="eyebrow">GROWTH ENGINE</div><h2>「速くなった」を一方向で見ない</h2><p class="sub">距離期に1500m予想が下がっても、それだけでLEVEL DOWNにはしない。逆に練習タイムだけ上がってレースが変わらなければ、簡単にLEVEL UPもしない。</p></div>
+ <div class="section">1500m 一点予想</div><section class="card">${svgLine("a","1500","")}</section>
+ <div class="section">3000m 一点予想</div><section class="card">${svgLine("b","3000","")}</section>
+ <div class="section">5000m 一点予想</div><section class="card">${svgLine("c","5000","")}</section>
+ <div class="section">能力LEVEL</div><section class="card"><div class="grid g3">${Object.entries({総合:state.levels.overall,有酸素:state.levels.aerobic,スピード:state.levels.speed,持久力:state.levels.endurance}).map(([k,v])=>`<div><div class="small">${k}</div><div class="level">${v}</div><div class="levelbar"><i style="width:${v/40*100}%"></i></div></div>`).join("")}</div></section>`;
+}
+
+function connect(){
+ return `<div class="grid g2"><section class="card"><div class="eyebrow">API SETTINGS</div><h2>ChatGPT 連携設定</h2>
+ <p class="sub">OpenAIのAPIキーを設定すると、監督がChatGPTと連動してパーソナル指導を行います。キーはスマホ内にのみ保存されます。</p>
+ <div class="field"><label>OpenAI API Key (sk-...)</label><input id="apikey" type="password" value="${esc(state.apiKey)}" placeholder="sk-proj-..."></div>
+ <div class="field" style="margin-top:10px"><label>モデル選択</label>
+ <select id="model">
+   <option value="gpt-4o-mini" ${state.model==="gpt-4o-mini"?"selected":""}>gpt-4o-mini (高速・軽量・安価)</option>
+   <option value="gpt-4o" ${state.model==="gpt-4o"?"selected":""}>gpt-4o (高精度・高品質)</option>
+ </select></div>
+ <button class="primary" style="margin-top:12px" onclick="saveSettings()">設定を保存</button>
+ 
+ <div class="section">友達とつながる（プロトタイプ）</div><div class="field"><label>招待コード</label><input id="code" placeholder="例：RQ-7F2K9"></div><button class="ghost" style="margin-top:8px" onclick="toast('招待コードを送信しました')">友達を招待</button>
+ </section>
+
+ <section class="card"><div class="eyebrow">FRIEND</div><h2>比較は「勝ち負け」ではなく構造。</h2><div class="rival"><div class="person"><div class="avatar">R</div><b style="display:block;margin-top:8px">友達ランナー</b><div class="small">共有中：計画 / 実績 / グラフ</div></div><div class="person"><div class="avatar" style="background:var(--green2)">YOU</div><b style="display:block;margin-top:8px">あなた</b><div class="small">自分のデータ</div></div></div><div class="section">比較できるもの</div>${["週間距離","強度の分布","ハード日の密度","睡眠・疲労","1500/3000/5000推移"].map(x=>`<div class="zone">${x}</div>`).join("")}</section></div>`;
+}
+
+function zones(){
+ const zs=[["Recovery","疲労を抜く・つなぐ"],["Aerobic","有酸素の土台"],["LT","持続的な高い有酸素負荷"],["VO2max","高強度有酸素"],["Speed","神経系・スピード"],["Race Specific","目標種目のリズム・持久力"]];
+ return `<div class="card"><div class="eyebrow">TRAINING ZONES</div><h2>今、何を鍛えている？</h2><p class="sub">これは概念的な分類。ラボで測った生理学的ゾーンではない。</p>${zs.map((z,i)=>`<div class="zone"><div class="row"><b>${z[0]}</b><span class="small">${z[1]}</span></div><div class="bar"><i style="width:${[25,45,55,68,35,62][i]}%"></i></div></div>`).join("")}</div>`;
+}
+
+function roadmap(){
+ return `<div class="grid g3">${[
+ ["NOW","県駅伝","駅伝に必要な有酸素・持久力を作る","green"],
+ ["WINTER","3000 / 5000","土台を記録につなげる","blue"],
+ ["NEXT SUMMER","1500m","スピードを再構築して勝負","pink"]
+ ].map(x=>`<div class="card"><span class="tag ${x[3]==="blue"?"blue":x[3]==="pink"?"pink":""}">${x[0]}</span><h2>${x[1]}</h2><p class="sub">${x[2]}</p><div class="progress"><i style="width:${x[0]==="NOW"?65:x[0]==="WINTER"?25:8}%"></i></div></div>`).join("")}</div>
+ <div class="card" style="margin-top:14px"><div class="eyebrow">DESIGN PRINCIPLE</div><h2>「今日」が「3年後」から切れない。</h2><p class="sub">短期の数字を追いすぎず、時期ごとに必要な能力を伸ばす。AI監督はそのズレを見つける役割。</p></div>`;
+}
+
+function toggleQuest(i){state.quests[i]=!state.quests[i];save();render()}
+
+function saveSettings(){
+  state.apiKey = document.getElementById("apikey").value.trim();
+  state.model = document.getElementById("model").value;
+  save();
+  toast("API設定を保存しました");
+}
+
+async function submitToCoach(){
+  // 入力値の取得
+  state.log.distance = Number(document.getElementById("dist").value) || 0;
+  state.log.zone = document.getElementById("zone").value;
+  state.log.note = document.getElementById("note").value;
+  save();
+
+  if(!state.apiKey){
+    alert("「SETTINGS / CONNECT」タブで OpenAI API Key を設定してください。");
+    go("connect");
+    return;
+  }
+
+  state.loading = true;
+  state.coachResponse = "ChatGPT 監督が本日の練習結果を厳密に分析中...";
+  render();
+
+  const prompt = `あなたは陸上長距離・中距離ランナーの「超厳しめ・忖度なしのAIヘッドコーチ」です。
+ユーザー（ランナー）から本日の練習報告が届きました。距離の長さだけでなく、目的達成度、疲労、痛み、睡眠から総合的に評価し、短く的確（200文字以内）に厳しい愛のあるフィードバックを行ってください。
+
+【本日の報告データ】
+- 練習距離: ${state.log.distance} km
+- 目的/ゾーン: ${state.log.zone}
+- 主観的きつさ (RPE 1-10): ${state.rpe}
+- 睡眠時間: ${state.sleep} 時間
+- 疲労感 (1-5): ${state.fatigue}
+- 痛み・違和感 (0-3): ${state.pain}
+- ひとこと・メモ: ${state.log.note || "なし"}
+
+アドバイスの方向性:
+- 痛みが1以上の場合は怪我予防を最優先で警告すること。
+- RPEや疲労度が高い場合、翌日のリカバリーを指示すること。
+- 距離稼ぎ目的の無理な走りは一蹴すること。`;
+
+  try {
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${state.apiKey}`
+      },
+      body: JSON.stringify({
+        model: state.model || "gpt-4o-mini",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.7
+      })
+    });
+
+    const data = await res.json();
+    if (data.error) {
+      state.coachResponse = `エラーが発生しました:\n${data.error.message}`;
+    } else {
+      state.coachResponse = data.choices[0].message.content;
+      toast("監督からフィードバックが届きました！");
+    }
+  } catch (err) {
+    state.coachResponse = `通信エラーが発生しました: ${err.message}`;
+  } finally {
+    state.loading = false;
+    save();
+    render();
+  }
+}
+
+function render(){
+  nav();
+  document.getElementById("main").innerHTML={home,plan,log,growth,connect,zones,roadmap}[state.tab]();
+}
+
+render();
+</script>
+</body>
+</html>
